@@ -11,7 +11,8 @@ api_key = "34f23575919a8f66017360a416c31ce7"
 base_url = "http://api.openweathermap.org/data/2.5/weather?"
 
 class Meteo():
-    def __init__(self,api_key):
+    def __init__(self,api_key,debug=False):
+        self.debug=debug
         # votre clé API ici
         self.api_key=api_key
         #URL de base
@@ -23,7 +24,7 @@ class Meteo():
         self.requete_ville(ville)
         self.main = self.dict["main"]
         self.coord = self.dict["coord"]
-        self.weather = self.dict["weather"]
+        self.weather = self.dict["weather"][0]
         self.wind = self.dict["wind"]
         self.clouds = self.dict["clouds"]
         self.sys = self.dict["sys"]
@@ -35,13 +36,23 @@ class Meteo():
         self.Hpourcent=self.main["humidity"]
 
         self.Pbar=self.main["pressure"]
-        
+
+        self.icon_weather=self.weather["icon"]
+    
+    def get_url(self,url,proxy={}):
+        if 'http' in proxy:
+            return requests.get(url, proxies=proxy)
+        else:
+            return requests.get(url)
 
     
     def requete_ville(self,ville):  
         url=self.ville_url + "appid=" + self.api_key + "&q=" + ville
-        response = requests.get(url)
+        response = self.get_url(url)
         self.dict = response.json()
+        if self.debug:
+            print(url)
+            print(self.dict)
     
 
 if __name__=="__main__":
